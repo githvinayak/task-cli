@@ -99,6 +99,50 @@ struct Task {
 //     println!("{} {} {}", r1.title, r2.title, r3.title);
 // }
 
+// fn add_task(tasks: &mut Vec<Task>, id: u32, title: String, done: bool) {
+//     let task = Task {
+//         id: id,
+//         title: title,
+//         done: done,
+//     };
+//     tasks.push(task)
+// }
+
+// fn main() {
+//     let mut tasks: Vec<Task> = Vec::new();
+//     add_task(&mut tasks, 1, String::from("leran rust"), false);
+//     add_task(&mut tasks, 1, String::from("leran rust"), false);
+//     add_task(&mut tasks, 1, String::from("leran rust"), false);
+
+//     for task in &tasks {
+//         println!("task : {:#?}", task)
+//     }
+// }
+
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+//     #[test]
+//     fn test_add_task() {
+//         let mut tasks: Vec<Task> = Vec::new();
+//         add_task(&mut tasks, 1, String::from("learn rust"), false);
+//         assert_eq!(tasks.len(), 1);
+//         assert_eq!(tasks[0].id, 1);
+//         assert_eq!(tasks[0].title, "learn rust");
+//     }
+// }
+
+
+fn print_str(str:&String){
+    println!("my name is :{}",str);
+}
+#[derive(Debug)]
+struct Task {
+    id: u32,
+    title: String,
+    done: bool,
+}
+
 fn add_task(tasks: &mut Vec<Task>, id: u32, title: String, done: bool) {
     let task = Task {
         id: id,
@@ -108,26 +152,41 @@ fn add_task(tasks: &mut Vec<Task>, id: u32, title: String, done: bool) {
     tasks.push(task)
 }
 
+fn list_tasks(tasks: &[Task]){
+     for task in tasks {
+        println!("task id: {} | task title: {} | task status: {}", [task.id](http://task.id/),task.title,task.done)
+    }
+}
+
 fn main() {
     let mut tasks: Vec<Task> = Vec::new();
     add_task(&mut tasks, 1, String::from("leran rust"), false);
     add_task(&mut tasks, 1, String::from("leran rust"), false);
     add_task(&mut tasks, 1, String::from("leran rust"), false);
-
-    for task in &tasks {
-        println!("task : {:#?}", task)
-    }
+    list_tasks(&tasks);
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
+mod tests{
+ use super::*;
     #[test]
-    fn test_add_task() {
-        let mut tasks: Vec<Task> = Vec::new();
-        add_task(&mut tasks, 1, String::from("learn rust"), false);
-        assert_eq!(tasks.len(), 1);
-        assert_eq!(tasks[0].id, 1);
-        assert_eq!(tasks[0].title, "learn rust");
+    fn test_list_is_empty_initially() {
+    let mut tasks : Vec<Task> = Vec::new();
+        assert_eq!(tasks.is_empty(),true)
+    }
+
+    #[test]
+    fn test_list_has_correct_count() {
+    let mut tasks : Vec<Task> = Vec::new();
+         add_task(&mut tasks, 1, String::from("learn rust"), false);
+          add_task(&mut tasks, 2, String::from("learn js"), false);
+          assert_eq!(tasks.len(),2)
+    }
+
+    #[test]
+    fn test_task_fields_are_correct() {
+    let mut tasks : Vec<Task> = Vec::new();
+         add_task(&mut tasks, 1, String::from("learn rust"), false);
+          assert_eq!(tasks[0].title,"learn rust")
     }
 }
