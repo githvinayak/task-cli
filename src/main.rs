@@ -59,12 +59,12 @@
 
 // Day 3 - Borrowing and References in Rust
 
-#[derive(Debug)]
-struct Task {
-    id: u32,
-    title: String,
-    done: bool,
-}
+// #[derive(Debug)]
+// struct Task {
+//     id: u32,
+//     title: String,
+//     done: bool,
+// }
 
 // fn print_task(task:&Task){
 //     println!("id:{} title:{} done:{}", task.id, task.title, task.done);
@@ -132,61 +132,108 @@ struct Task {
 //     }
 // }
 
+// fn print_str(str:&String){
+//     println!("my name is :{}",str);
+// }
+// #[derive(Debug)]
+// struct Task {
+//     id: u32,
+//     title: String,
+//     done: bool,
+// }
 
-fn print_str(str:&String){
-    println!("my name is :{}",str);
-}
-#[derive(Debug)]
-struct Task {
-    id: u32,
-    title: String,
-    done: bool,
+// fn add_task(tasks: &mut Vec<Task>, id: u32, title: String, done: bool) {
+//     let task = Task {
+//         id: id,
+//         title: title,
+//         done: done,
+//     };
+//     tasks.push(task)
+// }
+
+// fn list_tasks(tasks: &[Task]){
+//      for task in tasks {
+//         println!("task id: {} | task title: {} | task status: {}", [task.id](http://task.id/),task.title,task.done)
+//     }
+// }
+
+// fn main() {
+//     let mut tasks: Vec<Task> = Vec::new();
+//     add_task(&mut tasks, 1, String::from("leran rust"), false);
+//     add_task(&mut tasks, 1, String::from("leran rust"), false);
+//     add_task(&mut tasks, 1, String::from("leran rust"), false);
+//     list_tasks(&tasks);
+// }
+
+// #[cfg(test)]
+// mod tests{
+//  use super::*;
+//     #[test]
+//     fn test_list_is_empty_initially() {
+//     let mut tasks : Vec<Task> = Vec::new();
+//         assert_eq!(tasks.is_empty(),true)
+//     }
+
+//     #[test]
+//     fn test_list_has_correct_count() {
+//     let mut tasks : Vec<Task> = Vec::new();
+//          add_task(&mut tasks, 1, String::from("learn rust"), false);
+//           add_task(&mut tasks, 2, String::from("learn js"), false);
+//           assert_eq!(tasks.len(),2)
+//     }
+
+//     #[test]
+//     fn test_task_fields_are_correct() {
+//     let mut tasks : Vec<Task> = Vec::new();
+//          add_task(&mut tasks, 1, String::from("learn rust"), false);
+//           assert_eq!(tasks[0].title,"learn rust")
+//     }
+// }
+
+enum Command {
+    Add(String),
+    List,
+    Done(u32),
+    Delete(u32),
 }
 
-fn add_task(tasks: &mut Vec<Task>, id: u32, title: String, done: bool) {
-    let task = Task {
-        id: id,
-        title: title,
-        done: done,
-    };
-    tasks.push(task)
+fn parse_command(input: &str) -> Option<Command> {
+    let parts: Vec<&str> = input.splitn(2, " ").collect();
+    match parts[0] {
+        "add" => {
+            let title = parts[1].to_string();
+            return Some(Command::Add(title));
+        }
+        "list" => return Some(Command::List),
+        "done" => {
+            let task_id: u32 = parts[1].parse().unwrap();
+            return Some(Command::Done(task_id));
+        }
+        "delete" => {
+            let task_id: u32 = parts[1].parse().unwrap();
+            return Some(Command::Delete((task_id)));
+        }
+        _ => None,
+    }
 }
 
-fn list_tasks(tasks: &[Task]){
-     for task in tasks {
-        println!("task id: {} | task title: {} | task status: {}", [task.id](http://task.id/),task.title,task.done)
+fn run_command(cmd: Command) {
+    match cmd {
+        Command::Add(title) => println!("this is title:{}", title),
+        Command::List => println!("listing tasks.."),
+        Command::Done(id) => println!("marking this task done:{}", id),
+        Command::Delete(id) => println!("deleting this task:{}", id),
     }
 }
 
 fn main() {
-    let mut tasks: Vec<Task> = Vec::new();
-    add_task(&mut tasks, 1, String::from("leran rust"), false);
-    add_task(&mut tasks, 1, String::from("leran rust"), false);
-    add_task(&mut tasks, 1, String::from("leran rust"), false);
-    list_tasks(&tasks);
-}
+    let inputs = vec!["add Buy milk", "list", "done 1", "delete 2", "invalid"];
 
-#[cfg(test)]
-mod tests{
- use super::*;
-    #[test]
-    fn test_list_is_empty_initially() {
-    let mut tasks : Vec<Task> = Vec::new();
-        assert_eq!(tasks.is_empty(),true)
-    }
-
-    #[test]
-    fn test_list_has_correct_count() {
-    let mut tasks : Vec<Task> = Vec::new();
-         add_task(&mut tasks, 1, String::from("learn rust"), false);
-          add_task(&mut tasks, 2, String::from("learn js"), false);
-          assert_eq!(tasks.len(),2)
-    }
-
-    #[test]
-    fn test_task_fields_are_correct() {
-    let mut tasks : Vec<Task> = Vec::new();
-         add_task(&mut tasks, 1, String::from("learn rust"), false);
-          assert_eq!(tasks[0].title,"learn rust")
+    for input in inputs {
+        match parse_command(input) {
+            Some(cmd) => run_command(cmd),
+            None => println!("invalid command: {}", input),
+        }
     }
 }
+
