@@ -17,4 +17,4 @@ jobs:
       
     steps: 
       - name: vinayak
-        uses: echo "hello"
+        run: echo "hello"
