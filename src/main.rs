@@ -135,12 +135,11 @@
 // fn print_str(str:&String){
 //     println!("my name is :{}",str);
 // }
-// #[derive(Debug)]
 // struct Task {
 //     id: u32,
 //     title: String,
-//     done: bool,
-// }
+//     done: bool, }
+//
 
 // fn add_task(tasks: &mut Vec<Task>, id: u32, title: String, done: bool) {
 //     let task = Task {
@@ -189,7 +188,7 @@
 //           assert_eq!(tasks[0].title,"learn rust")
 //     }
 // }
-
+use std::env;
 enum Command {
     Add(String),
     List,
@@ -211,7 +210,7 @@ fn parse_command(input: &str) -> Option<Command> {
         }
         "delete" => {
             let task_id: u32 = parts[1].parse().unwrap();
-            return Some(Command::Delete((task_id)));
+            return Some(Command::Delete(task_id));
         }
         _ => None,
     }
@@ -227,13 +226,54 @@ fn run_command(cmd: Command) {
 }
 
 fn main() {
-    let inputs = vec!["add Buy milk", "list", "done 1", "delete 2", "invalid"];
-
-    for input in inputs {
-        match parse_command(input) {
+    // let inputs = vec!["add Buy milk", "list", "done 1", "delete 2", "invalid"];
+    let args:Vec<String> = env::args().collect();  
+    let input:String  = args[1..].join(" ");
+    println!("input:{}",input);
+    // for input in inputs {
+        match parse_command(&input) {
             Some(cmd) => run_command(cmd),
             None => println!("invalid command: {}", input),
         }
-    }
+    // }
 }
 
+//impl block
+// #[derive(Debug)]
+// struct Task {
+//     id: u32,
+//     title: String,
+//     done: bool,
+// }
+
+// impl Task {
+//     fn new(id: u32, title: String) -> Task {
+//         Task {
+//             id,
+//             title,
+//             done: false,
+//         }
+//     }
+
+//     fn mark_done(&mut self) {
+//         self.done = true
+//     }
+// }
+
+// fn main() {
+//     let mut task = Task::new(1, String::from("Learn Rust"));
+//     println!("{:#?}", task);
+
+//     task.mark_done();
+//     println!("{:#?}", task);
+// }
+
+//cli args
+
+// use std::env;
+
+// // #[derive(Debug)]
+// fn main(){
+//     let args:Vec<String> = env::args().collect(); 
+//     println!("{:?}",args)
+// }
