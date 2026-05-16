@@ -189,7 +189,9 @@
 //     }
 // }
 use std::env;
+use serde::{Serialize, Deserialize};
 
+const FILE_PATH: &str = "tasks.json";
 enum Command {
     Add(String),
     List,
@@ -218,7 +220,36 @@ impl Task {
     }
 }
 
+// check if file exists
+//std::path::Path::new(FILE_PATH).exists() 
 
+// // read file to string
+// std::fs::read_to_string(FILE_PATH).unwrap()
+
+// // parse JSON string to Vec<Task>
+// serde_json::from_str(&content).unwrap()
+
+// // convert Vec<Task> to JSON string (pretty printed)
+// serde_json::to_string_pretty(tasks).unwrap()
+
+// // write string to file
+// std::fs::write(FILE_PATH, content).unwrap()
+
+fn load_tasks() -> Vec<Task> {
+    // 1. check if file exists
+   if std::path::Path::new(FILE_PATH).exists() {
+    let content  = std::fs::read_to_string(FILE_PATH).unwrap();
+    return serde_json::from_str(&content).unwrap()
+   }
+   return Vec::new();
+}
+
+fn save_tasks(tasks: &[Task]) {
+    // 1. convert Vec<Task> to JSON string
+    let content= serde_json::to_string_pretty(tasks).unwrap();
+    // 2. write to tasks.json
+    std::fs::write(FILE_PATH, content).unwrap()
+}
 fn list_tasks(tasks: &[Task]) {
     for task in tasks {
         println!(
@@ -296,13 +327,13 @@ fn main() {
     // let inputs = vec!["add Buy milk", "list", "done 1", "delete 2", "invalid"];
     let args: Vec<String> = env::args().collect();
     let input: String = args[1..].join(" ");
-   let mut tasks = Vec::new();
+    let mut tasks  = load_tasks();
     // for input in inputs {
     match parse_command(&input) {
         Some(cmd) => run_command(cmd, &mut tasks),
         None => println!("invalid command: {}", input),
     }
-   
+    save_tasks(&tasks);
     // }
 }
 
