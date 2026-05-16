@@ -219,13 +219,31 @@ impl Task {
 }
 
 
+fn list_tasks(tasks: &[Task]) {
+    for task in tasks {
+        println!(
+            "task id: {} | task title: {} | task status: {}",
+            task.id, task.title, task.done
+        )
+    }
+}
+
+fn find_task(tasks: &mut [Task], id: u32) -> Option<&mut Task> {
+    for task in tasks {
+        if task.id == id {
+            return Some(task);
+        }
+    }
+    return None;
+}
+
 fn parse_command(input: &str) -> Option<Command> {
     let parts: Vec<&str> = input.splitn(2, " ").collect();
     match parts[0] {
         "add" => {
             if parts.len() < 2 {
                 return None;
-            } 
+            } // ✅
             let title = parts[1].to_string();
             return Some(Command::Add(title));
         }
@@ -233,14 +251,14 @@ fn parse_command(input: &str) -> Option<Command> {
         "done" => {
             if parts.len() < 2 {
                 return None;
-            } 
+            } // ✅
             let task_id: u32 = parts[1].parse().unwrap();
             return Some(Command::Done(task_id));
         }
         "delete" => {
             if parts.len() < 2 {
                 return None;
-            } 
+            } // ✅
             let task_id: u32 = parts[1].parse().unwrap();
             return Some(Command::Delete(task_id));
         }
@@ -248,32 +266,44 @@ fn parse_command(input: &str) -> Option<Command> {
     }
 }
 
-fn run_command(cmd: Command) {
+fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
     match cmd {
         Command::Add(title) => {
-            println!("Adding task: {}", title);
+            let id = tasks.len() as u32 + 1;
+            tasks.push(Task::new(id, title));
+            println!("task added successfully");
         }
-        Command::List => {
-            println!("Listing all tasks...");
-        }
+        Command::List => list_tasks(&tasks),
         Command::Done(id) => {
-            println!("Marking task {} as done", id);
+        //    let  task = find_task(tasks,id);
+        //    println!("marking this task done:{}", id);
+        //     task.unwrap().done = true;
+        match find_task(tasks, id){
+            Some(task)=>{
+                task.mark_done();
+            }
+            None => println!("no task found")
+        }
         }
         Command::Delete(id) => {
-            println!("Deleting task {}", id);
-        }
+            println!("deleting this task:{}", id);
+            tasks.retain(|t| t.id != id);
+        },
     }
 }
+
 fn main() {
-     let inputs = vec!["add Buy milk", "list", "done 1", "delete 2", "invalid"];
+    // let inputs = vec!["add Buy milk", "list", "done 1", "delete 2", "invalid"];
     let args: Vec<String> = env::args().collect();
     let input: String = args[1..].join(" ");
-let mut tasks = Vec::new();
+   let mut tasks = Vec::new();
     // for input in inputs {
     match parse_command(&input) {
-        Some(cmd) => run_command(cmd),
+        Some(cmd) => run_command(cmd, &mut tasks),
         None => println!("invalid command: {}", input),
     }
+   
     // }
 }
+
 
