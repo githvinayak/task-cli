@@ -300,11 +300,11 @@ fn parse_command(input: &str) -> Option<Command> {
 fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
     match cmd {
         Command::Add(title) => {
-            let id = tasks.len() as u32 + 1;
+            let id = tasks.iter().map( |t| t.id).max().unwrap_or(0) + 1;
             tasks.push(Task::new(id, title));
             println!("task added successfully");
         }
-        Command::List => list_tasks(&tasks),
+        Command::List => list_tasks(tasks),
         Command::Done(id) => {
         //    let  task = find_task(tasks,id);
         //    println!("marking this task done:{}", id);
@@ -326,6 +326,12 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
 fn main() {
     // let inputs = vec!["add Buy milk", "list", "done 1", "delete 2", "invalid"];
     let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+         println!("Usage: taskcli <command> [args]");
+        println!("Commands: add <title> | list | done <id> | delete <id>");
+        return;
+    }
+        
     let input: String = args[1..].join(" ");
     let mut tasks  = load_tasks();
     // for input in inputs {
