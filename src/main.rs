@@ -255,7 +255,7 @@ pub fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
             let id = tasks.iter().map(|t| t.id).max().unwrap_or(0) + 1;
             tasks.push(Task::new(id, title));
             println!("task added successfully");
-        }
+        }     
         Command::List => list_tasks(tasks),
         Command::Done(id) => {
             //    let  task = find_task(tasks,id);
