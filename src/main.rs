@@ -260,12 +260,15 @@ fn list_tasks(tasks: &[Task]) {
 }
 
 fn find_task(tasks: &mut [Task], id: u32) -> Option<&mut Task> {
-    for task in tasks {
-        if task.id == id {
-            return Some(task);
-        }
-    }
-    return None;
+    tasks.iter_mut().find(|t| t.id == id)
+}
+
+fn pending_tasks(tasks:&[Task])-> usize{
+  tasks.iter().filter(|t| !t.done).count()
+}
+
+fn all_done(tasks:&[Task])->bool{
+  tasks.iter().all(|t| t.done)
 }
 
 fn parse_command(input: &str) -> Option<Command> {
@@ -334,6 +337,8 @@ fn main() {
         
     let input: String = args[1..].join(" ");
     let mut tasks  = load_tasks();
+     println!("pending: {}", pending_tasks(&tasks));
+    println!("all done: {}", all_done(&tasks));
     // for input in inputs {
     match parse_command(&input) {
         Some(cmd) => run_command(cmd, &mut tasks),
