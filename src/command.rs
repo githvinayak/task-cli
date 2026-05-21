@@ -17,18 +17,29 @@ pub fn parse_command(input: &str) -> Option<Command> {
         }
         "list" => return Some(Command::List),
         "done" => {
-            if parts.len() < 2 {
-                return None;
-            } // ✅
-            let task_id: u32 = parts[1].parse().unwrap();
-            return Some(Command::Done(task_id));
+            if parts.len() < 2 { return None; } // ✅
+            //  let task_id: u32 = 
+            match parts[1].parse::<u32>(){
+                Ok(task_id) => Some(Command::Done(task_id)),
+                Err(_)=>{
+                    println!("⚠️ invalid id: '{}' — must be a number", parts[1]);
+                    None
+                }
+            }
         }
         "delete" => {
             if parts.len() < 2 {
                 return None;
             } // ✅
-            let task_id: u32 = parts[1].parse().unwrap();
-            return Some(Command::Delete(task_id));
+            if parts.len() < 2 { return None; } // ✅
+            //  let task_id: u32 = 
+            match parts[1].parse::<u32>(){
+                Ok(task_id) => Some(Command::Delete(task_id)),
+                Err(_)=>{
+                    println!("⚠️ invalid id: '{}' — must be a number", parts[1]);
+                    None
+                }
+            }
         }
         _ => None,
     }
