@@ -190,11 +190,11 @@
 // }
 mod command;
 mod task;
+mod storage;
 use command::{Command, parse_command};
 use std::env;
 use task::Task;
-
-const FILE_PATH: &str = "tasks.json";
+use storage::{load_tasks,save_tasks};
 
 // check if file exists
 //std::path::Path::new(FILE_PATH).exists()
@@ -211,48 +211,6 @@ const FILE_PATH: &str = "tasks.json";
 // // write string to file
 // std::fs::write(FILE_PATH, content).unwrap()
 
-fn load_tasks() -> Vec<Task> {
-    // 1. check if file exists
-    if std::path::Path::new(FILE_PATH).exists(){
-    
-     let content = match std::fs::read_to_string(FILE_PATH){
-        Ok(c)=> c,
-        Err(e)=>{
-         println!("cannot read file : file might be corrupted {}",e);
-          return Vec::new();
-        }
-     };
-
-     match serde_json::from_str(&content){
-        Ok(tasks)=> tasks,
-        Err(e)=>{
-         println!("cannot read file : file might be corrupted {}",e);
-          return Vec::new();
-        }
-     }
-    }else{
-        return Vec::new();
-    }
-}
-
-fn save_tasks(tasks: &[Task]) {
-    // 1. convert Vec<Task> to JSON string
-    // let content = 
-   let content = match serde_json::to_string_pretty(tasks){
-        Ok(c)=> c,
-        Err(e)=>{
-            println!("⚠️ could not serialize tasks: {}", e);
-            return;
-        }
-    };
-    // 2. wlrite to tasks.json
-    match std::fs::write(FILE_PATH, content){
-        Ok(_)=> {},
-        Err(e)=>{
-            println!("⚠️ could not save tasks: {}", e);
-        }
-    };
-}
 // fn list_tasks(tasks: &[Task]) {
 //    println!("Your Tasks..");
 //    println!("{}","_".repeat(30));
@@ -346,29 +304,6 @@ fn main() {
     println!("DEBUG before save: {} tasks", tasks.len()); // ← add this
     save_tasks(&tasks);
 }
-
-// fn main() {
-//     // let inputs = vec!["add Buy milk", "list", "done 1", "delete 2", "invalid"];
-//     let args: Vec<String> = env::args().collect();
-//     if args.len() < 2 {
-//         println!("Usage: taskcli <command> [args]");
-//         println!("Commands: add <title> | list | done <id> | delete <id>");
-//         return;
-//     }
-
-//     let input: String = args[1..].join(" ");
-//     let mut tasks = load_tasks();
-//     println!("all tasks: {}", tasks.len());
-//     // println!("pending: {}", pending_tasks(&tasks));
-//     // println!("all done: {}", all_done(&tasks));
-//     // for input in inputs {
-//     match parse_command(&input) {
-//         Some(cmd) => run_command(cmd, &mut tasks),
-//         None => println!("invalid command: {}", input),
-//     }
-//     save_tasks(&tasks);
-//     // }
-// }
 
 #[cfg(test)]
 mod tests {
