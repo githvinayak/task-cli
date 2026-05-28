@@ -213,9 +213,8 @@ const FILE_PATH: &str = "tasks.json";
 
 fn load_tasks() -> Vec<Task> {
     // 1. check if file exists
-    if std::path::Path::new(FILE_PATH).exists() {
-        return Vec::new();
-    }
+    if std::path::Path::new(FILE_PATH).exists(){
+    
      let content = match std::fs::read_to_string(FILE_PATH){
         Ok(c)=> c,
         Err(e)=>{
@@ -231,6 +230,9 @@ fn load_tasks() -> Vec<Task> {
           return Vec::new();
         }
      }
+    }else{
+        return Vec::new();
+    }
 }
 
 fn save_tasks(tasks: &[Task]) {
@@ -251,33 +253,57 @@ fn save_tasks(tasks: &[Task]) {
         }
     };
 }
+// fn list_tasks(tasks: &[Task]) {
+//    println!("Your Tasks..");
+//    println!("{}","_".repeat(30));
+//    println!("\n Pending");
+//    tasks.iter().filter(|t| !t.done).for_each(|t| println!("{}.{}",t.id,t.title));
+//    println!("\n Completed");
+//    tasks.iter().filter(|t| t.done).for_each(|t| println!("{}.{}",t.id,t.title));
+//     println!("{}","_".repeat(30));
+// println!("Task completed :{}",tasks.iter().filter(|t| !t.done).count());
+// println!("Task pending :{}",tasks.iter().filter(|t| t.done).count())
+// }
+
 fn list_tasks(tasks: &[Task]) {
-    for task in tasks {
-        println!(
-            "task id: {} | task title: {} | task status: {}",
-            task.id, task.title, task.done
-        )
-    }
+     println!("tasks {}",tasks.len());
+    println!("📋 Your Tasks");
+    println!("{}", "─".repeat(30));
+
+    println!("\n⏳ Pending:");
+    tasks.iter()
+        .filter(|t| !t.done)
+        .for_each(|t| println!("  {} . {}", t.id, t.title));
+
+    println!("\n✅ Completed:");
+    tasks.iter()
+        .filter(|t| t.done)
+        .for_each(|t| println!("  {}. {}", t.id, t.title));
+
+    println!("{}", "─".repeat(30));
+    println!("✅ Completed : {}", tasks.iter().filter(|t| t.done).count());
+    println!("⏳ Pending   : {}", tasks.iter().filter(|t| !t.done).count());
 }
 
 fn find_task(tasks: &mut [Task], id: u32) -> Option<&mut Task> {
     tasks.iter_mut().find(|t| t.id == id)
 }
 
-fn pending_tasks(tasks: &[Task]) -> usize {
-    tasks.iter().filter(|t| !t.done).count()
-}
+// fn pending_tasks(tasks: &[Task]) -> usize {
+//     tasks.iter().filter(|t| !t.done).count()
+// }
 
-fn all_done(tasks: &[Task]) -> bool {
-    tasks.iter().all(|t| t.done)
-}
+// fn all_done(tasks: &[Task]) -> bool {
+//     tasks.iter().all(|t| t.done)
+// }
 
 pub fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
+    // println!("tasks {}",tasks.len());
     match cmd {
         Command::Add(title) => {
             let id = tasks.iter().map(|t| t.id).max().unwrap_or(0) + 1;
-            tasks.push(Task::new(id, title));
-            println!("task added successfully");
+            tasks.push(Task::new(id, title.clone()));
+            println!("Task {} addded : {}",id,title);
         }
         Command::List => list_tasks(tasks),
         Command::Done(id) => {
@@ -287,21 +313,22 @@ pub fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
             match find_task(tasks, id) {
                 Some(task) => {
                     task.mark_done();
+                    println!("Task {} marked as done",id);
                 }
                 None => println!("no task found"),
             }
         }
         Command::Delete(id) => {
-            println!("deleting this task:{}", id);
             tasks.retain(|t| t.id != id);
+             println!("Task {} deleted",id);
         }
     }
 }
 
 fn main() {
-    // let inputs = vec!["add Buy milk", "list", "done 1", "delete 2", "invalid"];
     let args: Vec<String> = env::args().collect();
-    if args.len() < 2 {
+
+       if args.len() < 2 {
         println!("Usage: taskcli <command> [args]");
         println!("Commands: add <title> | list | done <id> | delete <id>");
         return;
@@ -309,16 +336,39 @@ fn main() {
 
     let input: String = args[1..].join(" ");
     let mut tasks = load_tasks();
-    println!("pending: {}", pending_tasks(&tasks));
-    println!("all done: {}", all_done(&tasks));
-    // for input in inputs {
+    println!("DEBUG after load: {} tasks", tasks.len()); // ← add this
+
     match parse_command(&input) {
         Some(cmd) => run_command(cmd, &mut tasks),
         None => println!("invalid command: {}", input),
     }
+
+    println!("DEBUG before save: {} tasks", tasks.len()); // ← add this
     save_tasks(&tasks);
-    // }
 }
+
+// fn main() {
+//     // let inputs = vec!["add Buy milk", "list", "done 1", "delete 2", "invalid"];
+//     let args: Vec<String> = env::args().collect();
+//     if args.len() < 2 {
+//         println!("Usage: taskcli <command> [args]");
+//         println!("Commands: add <title> | list | done <id> | delete <id>");
+//         return;
+//     }
+
+//     let input: String = args[1..].join(" ");
+//     let mut tasks = load_tasks();
+//     println!("all tasks: {}", tasks.len());
+//     // println!("pending: {}", pending_tasks(&tasks));
+//     // println!("all done: {}", all_done(&tasks));
+//     // for input in inputs {
+//     match parse_command(&input) {
+//         Some(cmd) => run_command(cmd, &mut tasks),
+//         None => println!("invalid command: {}", input),
+//     }
+//     save_tasks(&tasks);
+//     // }
+// }
 
 #[cfg(test)]
 mod tests {
