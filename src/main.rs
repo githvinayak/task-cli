@@ -262,7 +262,7 @@ fn validate_title(title: &str) -> bool {
     !title.trim().is_empty()
 }
 
-pub fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
+fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
     // println!("tasks {}",tasks.len());
     match cmd {
         Command::Add(title) => {
