@@ -224,7 +224,6 @@ use task::Task;
 // }
 
 fn list_tasks(tasks: &[Task]) {
-    println!("tasks {}", tasks.len());
     println!("📋 Your Tasks");
     println!("{}", "─".repeat(30));
 
