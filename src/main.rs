@@ -275,15 +275,13 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
             }
         }
         Command::List => list_tasks(tasks),
-        Command::Done(id) => {
-            match find_task(tasks, id) {
-                Some(task) => {
-                    task.mark_done();
-                    println!("Task {} marked as done", id);
-                }
-                None => println!("❌ No task found with id: {}", id),
+        Command::Done(id) => match find_task(tasks, id) {
+            Some(task) => {
+                task.mark_done();
+                println!("Task {} marked as done", id);
             }
-        }
+            None => println!("❌ No task found with id: {}", id),
+        },
         Command::Delete(id) => {
             if tasks.iter().any(|t| t.id == id) {
                 tasks.retain(|t| t.id != id);
@@ -381,4 +379,28 @@ mod tests {
         // check returns None
         assert!(result.is_none());
     }
+    #[test]
+    fn test_full_cli_lifecycle() {
+        let mut tasks: Vec<Task> = Vec::new();
+
+        // add 3 tasks using run_command
+
+        let titles:Vec<&str> = vec!["Lern Rust","Practice Rust","Master Rust"];
+        for title in titles{
+            run_command(Command::Add(title.to_string()), &mut tasks);
+        }
+        // check count
+        assert_eq!(tasks.len(),3);
+        // mark done
+        run_command(Command::Done(1), &mut tasks);
+        // check done status
+        assert_eq!(tasks[0].done,true);
+        // delete
+        run_command(Command::Delete(1), &mut tasks);
+        // check final state
+        assert_eq!(tasks.len(),2);
+        assert_eq!(tasks[0].id,2);
+        assert_eq!(tasks[1].id,3);
+    }
+   
 }
