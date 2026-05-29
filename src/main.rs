@@ -269,7 +269,7 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
             let id = tasks.iter().map(|t| t.id).max().unwrap_or(0) + 1;
             if validate_title(&title) {
                 tasks.push(Task::new(id, title.clone()));
-                println!("Task {} addded : {}", id, title);
+                println!("Task {} added : {}", id, title);
             } else {
                 println!("Please provide valid title")
             }
