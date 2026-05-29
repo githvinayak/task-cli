@@ -402,5 +402,31 @@ mod tests {
         assert_eq!(tasks[0].id,2);
         assert_eq!(tasks[1].id,3);
     }
+
+    #[test]
+
+    fn test_empty_task_Add(){
+
+        let mut tasks:Vec<Task> = Vec::new();
+
+        run_command(Command::Add(String::from("")), &mut tasks);
+
+        assert_eq!(tasks.len(),0)
+
+    }
+
+    
+
+    #[test]
+
+    fn test_done_nonexistent_task(){
+
+        let mut tasks = setup_tasks();
+
+        run_command(Command::Done(99), &mut tasks);
+
+        assert!(tasks.iter().all(|t| !t.done))
+
+    }
    
 }
