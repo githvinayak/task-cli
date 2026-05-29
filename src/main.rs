@@ -189,12 +189,12 @@
 //     }
 // }
 mod command;
-mod task;
 mod storage;
+mod task;
 use command::{Command, parse_command};
 use std::env;
+use storage::{load_tasks, save_tasks};
 use task::Task;
-use storage::{load_tasks,save_tasks};
 
 // check if file exists
 //std::path::Path::new(FILE_PATH).exists()
@@ -224,23 +224,28 @@ use storage::{load_tasks,save_tasks};
 // }
 
 fn list_tasks(tasks: &[Task]) {
-     println!("tasks {}",tasks.len());
+    println!("tasks {}", tasks.len());
     println!("📋 Your Tasks");
     println!("{}", "─".repeat(30));
 
     println!("\n⏳ Pending:");
-    tasks.iter()
+    tasks
+        .iter()
         .filter(|t| !t.done)
         .for_each(|t| println!("  {} . {}", t.id, t.title));
 
     println!("\n✅ Completed:");
-    tasks.iter()
+    tasks
+        .iter()
         .filter(|t| t.done)
         .for_each(|t| println!("  {}. {}", t.id, t.title));
 
     println!("{}", "─".repeat(30));
     println!("✅ Completed : {}", tasks.iter().filter(|t| t.done).count());
-    println!("⏳ Pending   : {}", tasks.iter().filter(|t| !t.done).count());
+    println!(
+        "⏳ Pending   : {}",
+        tasks.iter().filter(|t| !t.done).count()
+    );
 }
 
 fn find_task(tasks: &mut [Task], id: u32) -> Option<&mut Task> {
@@ -254,31 +259,39 @@ fn find_task(tasks: &mut [Task], id: u32) -> Option<&mut Task> {
 // fn all_done(tasks: &[Task]) -> bool {
 //     tasks.iter().all(|t| t.done)
 // }
+fn validate_title(title: &str) -> bool {
+    !title.trim().is_empty()
+}
 
 pub fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
     // println!("tasks {}",tasks.len());
     match cmd {
         Command::Add(title) => {
             let id = tasks.iter().map(|t| t.id).max().unwrap_or(0) + 1;
-            tasks.push(Task::new(id, title.clone()));
-            println!("Task {} addded : {}",id,title);
+            if validate_title(&title) {
+                tasks.push(Task::new(id, title.clone()));
+                println!("Task {} addded : {}", id, title);
+            } else {
+                println!("Please provide valid title")
+            }
         }
         Command::List => list_tasks(tasks),
         Command::Done(id) => {
-            //    let  task = find_task(tasks,id);
-            //    println!("marking this task done:{}", id);
-            //     task.unwrap().done = true;
             match find_task(tasks, id) {
                 Some(task) => {
                     task.mark_done();
-                    println!("Task {} marked as done",id);
+                    println!("Task {} marked as done", id);
                 }
                 None => println!("no task found"),
             }
         }
         Command::Delete(id) => {
-            tasks.retain(|t| t.id != id);
-             println!("Task {} deleted",id);
+            if tasks.iter().any(|t| t.id == id) {
+                tasks.retain(|t| t.id != id);
+                println!("Task {} deleted", id);
+            } else {
+                println!("❌ No task found with id: {}", id);
+            }
         }
     }
 }
@@ -286,7 +299,7 @@ pub fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-       if args.len() < 2 {
+    if args.len() < 2 {
         println!("Usage: taskcli <command> [args]");
         println!("Commands: add <title> | list | done <id> | delete <id>");
         return;
@@ -294,14 +307,14 @@ fn main() {
 
     let input: String = args[1..].join(" ");
     let mut tasks = load_tasks();
-    println!("DEBUG after load: {} tasks", tasks.len()); // ← add this
+    // println!("DEBUG after load: {} tasks", tasks.len()); // ← add this
 
     match parse_command(&input) {
         Some(cmd) => run_command(cmd, &mut tasks),
         None => println!("invalid command: {}", input),
     }
 
-    println!("DEBUG before save: {} tasks", tasks.len()); // ← add this
+    // println!("DEBUG before save: {} tasks", tasks.len()); // ← add this
     save_tasks(&tasks);
 }
 
@@ -365,7 +378,7 @@ mod tests {
     #[test]
     fn test_invalid_command() {
         // parse_command("invalid")
-       let result = parse_command("invalid");
+        let result = parse_command("invalid");
         // check returns None
         assert!(result.is_none());
     }
