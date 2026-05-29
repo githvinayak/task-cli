@@ -281,7 +281,7 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
                     task.mark_done();
                     println!("Task {} marked as done", id);
                 }
-                None => println!("no task found"),
+                None => println!("❌ No task found with id: {}", id),
             }
         }
         Command::Delete(id) => {
