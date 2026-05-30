@@ -1,12 +1,15 @@
+pub enum SortOrder {
+    SortById,
+    SortByStatus,
+}
+
 pub enum Command {
     Add(String),
-    List,
+    List(SortOrder),
     Done(u32),
     Delete(u32),
     Clear,
 }
-
-
 
 pub fn parse_command(input: &str) -> Option<Command> {
     let parts: Vec<&str> = input.splitn(2, " ").collect();
@@ -18,7 +21,16 @@ pub fn parse_command(input: &str) -> Option<Command> {
             let title = parts[1].to_string();
             return Some(Command::Add(title));
         }
-        "list" => Some(Command::List),
+        "list" => {
+            if parts.len() < 2 {
+                return None;
+            } // ✅
+            match parts[1] {
+                "--by-status" => Some(Command::List(SortOrder::SortByStatus)),
+                "--by-id" => Some(Command::List(SortOrder::SortById)),
+                _ => Some(Command::List(SortOrder::SortById)),
+            }
+        }
         "done" => {
             if parts.len() < 2 {
                 return None;

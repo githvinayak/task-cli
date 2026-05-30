@@ -191,7 +191,7 @@
 mod command;
 mod storage;
 mod task;
-use command::{Command, parse_command};
+use command::{Command,SortOrder, parse_command};
 use std::env;
 use std::io;
 use std::io::Write;
@@ -225,28 +225,41 @@ use task::Task;
 // println!("Task pending :{}",tasks.iter().filter(|t| t.done).count())
 // }
 
-fn list_tasks(tasks: &[Task]) {
-    println!("📋 Your Tasks");
-    println!("{}", "─".repeat(30));
+// fn list_tasks(tasks: &[Task],sort:SortOrder) {
+//     println!("📋 Your Tasks");
+//     println!("{}", "─".repeat(30));
 
-    println!("\n⏳ Pending:");
-    tasks
-        .iter()
-        .filter(|t| !t.done)
-        .for_each(|t| println!("  {} . {}", t.id, t.title));
+//     println!("\n⏳ Pending:");
+//     tasks
+//         .iter()
+//         .filter(|t| !t.done)
+//         .for_each(|t| println!("  {} . {}", t.id, t.title));
 
-    println!("\n✅ Completed:");
-    tasks
-        .iter()
-        .filter(|t| t.done)
-        .for_each(|t| println!("  {}. {}", t.id, t.title));
+//     println!("\n✅ Completed:");
+//     tasks
+//         .iter()
+//         .filter(|t| t.done)
+//         .for_each(|t| println!("  {}. {}", t.id, t.title));
 
-    println!("{}", "─".repeat(30));
-    println!("✅ Completed : {}", tasks.iter().filter(|t| t.done).count());
-    println!(
-        "⏳ Pending   : {}",
-        tasks.iter().filter(|t| !t.done).count()
-    );
+//     println!("{}", "─".repeat(30));
+//     println!("✅ Completed : {}", tasks.iter().filter(|t| t.done).count());
+//     println!(
+//         "⏳ Pending   : {}",
+//         tasks.iter().filter(|t| !t.done).count()
+//     );
+// }
+
+fn list_tasks(tasks: &[Task],sort:SortOrder) {
+    let mut sorted = tasks.to_vec();
+
+    match sort{
+        SortOrder::SortById =>{
+            sorted.sort_by(|a,b| a.id.cmp(&b.id));
+        },
+        SortOrder::SortByStatus =>{
+            sorted.sort_by(|a,b| a.done.cmp(&b.done));
+        },
+    }
 }
 
 fn find_task(tasks: &mut [Task], id: u32) -> Option<&mut Task> {
@@ -289,7 +302,7 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
                 println!("Please provide valid title")
             }
         }
-        Command::List => list_tasks(tasks),
+        Command::List(sort) => list_tasks(tasks,sort),
         Command::Done(id) => match find_task(tasks, id) {
             Some(task) => {
                 task.mark_done();
