@@ -193,6 +193,8 @@ mod storage;
 mod task;
 use command::{Command, parse_command};
 use std::env;
+use std::io;
+use std::io::Write;
 use storage::{load_tasks, save_tasks};
 use task::Task;
 
@@ -262,6 +264,19 @@ fn validate_title(title: &str) -> bool {
     !title.trim().is_empty()
 }
 
+fn ask_confirmation(message: &str) -> bool {
+    print!("{}", message);
+    io::stdout().flush().unwrap();
+    let mut input: String = String::from("");
+    match io::stdin().read_line(&mut input){
+        Ok(_)=> input.trim() == "yes",
+        Err(err)=>{
+            println!("can;t read user input {}",err);
+            false
+        }
+    }
+}
+
 fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
     // println!("tasks {}",tasks.len());
     match cmd {
@@ -288,6 +303,13 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
                 println!("Task {} deleted", id);
             } else {
                 println!("❌ No task found with id: {}", id);
+            }
+        }
+        Command::Clear => {
+            if ask_confirmation("Arey you sure yes/no?") {
+                tasks.clear();
+            } else {
+                println!("cancelled")
             }
         }
     }
@@ -385,48 +407,41 @@ mod tests {
 
         // add 3 tasks using run_command
 
-        let titles:Vec<&str> = vec!["Lern Rust","Practice Rust","Master Rust"];
-        for title in titles{
+        let titles: Vec<&str> = vec!["Lern Rust", "Practice Rust", "Master Rust"];
+        for title in titles {
             run_command(Command::Add(title.to_string()), &mut tasks);
         }
         // check count
-        assert_eq!(tasks.len(),3);
+        assert_eq!(tasks.len(), 3);
         // mark done
         run_command(Command::Done(1), &mut tasks);
         // check done status
-        assert_eq!(tasks[0].done,true);
+        assert_eq!(tasks[0].done, true);
         // delete
         run_command(Command::Delete(1), &mut tasks);
         // check final state
-        assert_eq!(tasks.len(),2);
-        assert_eq!(tasks[0].id,2);
-        assert_eq!(tasks[1].id,3);
+        assert_eq!(tasks.len(), 2);
+        assert_eq!(tasks[0].id, 2);
+        assert_eq!(tasks[1].id, 3);
     }
 
     #[test]
 
-    fn test_empty_task_Add(){
-
-        let mut tasks:Vec<Task> = Vec::new();
+    fn test_empty_task_Add() {
+        let mut tasks: Vec<Task> = Vec::new();
 
         run_command(Command::Add(String::from("")), &mut tasks);
 
-        assert_eq!(tasks.len(),0)
-
+        assert_eq!(tasks.len(), 0)
     }
-
-    
 
     #[test]
 
-    fn test_done_nonexistent_task(){
-
+    fn test_done_nonexistent_task() {
         let mut tasks = setup_tasks();
 
         run_command(Command::Done(99), &mut tasks);
 
         assert!(tasks.iter().all(|t| !t.done))
-
     }
-   
 }

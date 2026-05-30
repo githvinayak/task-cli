@@ -3,7 +3,10 @@ pub enum Command {
     List,
     Done(u32),
     Delete(u32),
+    Clear,
 }
+
+
 
 pub fn parse_command(input: &str) -> Option<Command> {
     let parts: Vec<&str> = input.splitn(2, " ").collect();
@@ -15,13 +18,15 @@ pub fn parse_command(input: &str) -> Option<Command> {
             let title = parts[1].to_string();
             return Some(Command::Add(title));
         }
-        "list" => return Some(Command::List),
+        "list" => Some(Command::List),
         "done" => {
-            if parts.len() < 2 { return None; } // ✅
-            //  let task_id: u32 = 
-            match parts[1].parse::<u32>(){
+            if parts.len() < 2 {
+                return None;
+            } // ✅
+            //  let task_id: u32 =
+            match parts[1].parse::<u32>() {
                 Ok(task_id) => Some(Command::Done(task_id)),
-                Err(_)=>{
+                Err(_) => {
                     println!("⚠️ invalid id: '{}' — must be a number", parts[1]);
                     None
                 }
@@ -31,16 +36,19 @@ pub fn parse_command(input: &str) -> Option<Command> {
             if parts.len() < 2 {
                 return None;
             } // ✅
-            if parts.len() < 2 { return None; } // ✅
-            //  let task_id: u32 = 
-            match parts[1].parse::<u32>(){
+            if parts.len() < 2 {
+                return None;
+            } // ✅
+            //  let task_id: u32 =
+            match parts[1].parse::<u32>() {
                 Ok(task_id) => Some(Command::Delete(task_id)),
-                Err(_)=>{
+                Err(_) => {
                     println!("⚠️ invalid id: '{}' — must be a number", parts[1]);
                     None
                 }
             }
         }
+        "clear" => Some(Command::Clear),
         _ => None,
     }
 }
