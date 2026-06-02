@@ -191,7 +191,7 @@
 mod command;
 mod storage;
 mod task;
-use command::{Command,SortOrder, parse_command};
+use command::{Command, SortOrder, parse_command};
 use std::env;
 use std::io;
 use std::io::Write;
@@ -249,17 +249,42 @@ use task::Task;
 //     );
 // }
 
-fn list_tasks(tasks: &[Task],sort:SortOrder) {
+fn list_tasks(tasks: &[Task], sort: SortOrder) {
     let mut sorted = tasks.to_vec();
-
-    match sort{
-        SortOrder::SortById =>{
-            sorted.sort_by(|a,b| a.id.cmp(&b.id));
-        },
-        SortOrder::SortByStatus =>{
-            sorted.sort_by(|a,b| a.done.cmp(&b.done));
-        },
+    // println!("📋 Your Tasks{:?} and order of sorting {:?}", &tasks, &sort);
+    match sort {
+        SortOrder::SortById => {
+            sorted.sort_by(|a, b| a.id.cmp(&b.id));
+        }
+        SortOrder::SortByStatus => {
+            sorted.sort_by(|a, b| a.done.cmp(&b.done));
+        }
     }
+
+    println!("📋 Your Tasks");
+    println!("{}", "─".repeat(30));
+
+    println!("\n⏳ Pending:");
+    sorted
+        .iter()
+        .filter(|t| !t.done)
+        .for_each(|t| println!("  {} . {}", t.id, t.title));
+
+    println!("\n✅ Completed:");
+    sorted
+        .iter()
+        .filter(|t| t.done)
+        .for_each(|t| println!("  {}. {}", t.id, t.title));
+
+    println!("{}", "─".repeat(30));
+    println!(
+        "✅ Completed : {}",
+        sorted.iter().filter(|t| t.done).count()
+    );
+    println!(
+        "⏳ Pending   : {}",
+        sorted.iter().filter(|t| !t.done).count()
+    );
 }
 
 fn find_task(tasks: &mut [Task], id: u32) -> Option<&mut Task> {
@@ -281,10 +306,10 @@ fn ask_confirmation(message: &str) -> bool {
     print!("{}", message);
     io::stdout().flush().unwrap();
     let mut input: String = String::from("");
-    match io::stdin().read_line(&mut input){
-        Ok(_)=> input.trim() == "yes",
-        Err(err)=>{
-            println!("can;t read user input {}",err);
+    match io::stdin().read_line(&mut input) {
+        Ok(_) => input.trim() == "yes",
+        Err(err) => {
+            println!("can;t read user input {}", err);
             false
         }
     }
@@ -302,7 +327,7 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
                 println!("Please provide valid title")
             }
         }
-        Command::List(sort) => list_tasks(tasks,sort),
+        Command::List(sort) => list_tasks(tasks, sort),
         Command::Done(id) => match find_task(tasks, id) {
             Some(task) => {
                 task.mark_done();
@@ -330,10 +355,10 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-
+ println!("args: {:?}", args);
     if args.len() < 2 {
         println!("Usage: taskcli <command> [args]");
-        println!("Commands: add <title> | list | done <id> | delete <id>");
+        println!("Commands: add <title> | list <sorting order>| done <id> | delete <id>");
         return;
     }
 
