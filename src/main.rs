@@ -351,9 +351,14 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
             }
         }
         Command::Help => {
-            for cmd in Command::ALL {
-                println!("{:?}", cmd);
-            }
+            println!("📋 Available Commands:");
+            println!("  add <title>     → add a new task");
+            println!("  list            → list all tasks");
+            println!("  list --by-status → sort by status");
+            println!("  done <id>       → mark task done");
+            println!("  delete <id>     → delete a task");
+            println!("  clear           → clear all tasks");
+            println!("  help            → show this message");
         }
     }
 }

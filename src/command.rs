@@ -1,4 +1,3 @@
-use crate::command::{self, SortOrder::SortById};
 
 #[derive(Debug)]
 pub enum SortOrder {
@@ -16,10 +15,6 @@ pub enum Command {
     Help
 }
 
-impl Command{
-    pub const ALL:[Self;5] = [Command::Add(String::new()),Command::List(SortById),Command::Done(0),Command::Delete(0),Command::Clear]; 
-}
-
 pub fn parse_command(input: &str) -> Option<Command> {
     let parts: Vec<&str> = input.splitn(2, " ").collect();
     match parts[0] {
@@ -32,7 +27,7 @@ pub fn parse_command(input: &str) -> Option<Command> {
         }
         "list" => {
             if parts.len() < 2 {
-                return None;
+                return Some(Command::List(SortOrder::SortById));
             } // ✅
             match parts[1] {
                 "--by-status" => Some(Command::List(SortOrder::SortByStatus)),
@@ -54,9 +49,6 @@ pub fn parse_command(input: &str) -> Option<Command> {
             }
         }
         "delete" => {
-            if parts.len() < 2 {
-                return None;
-            } // ✅
             if parts.len() < 2 {
                 return None;
             } // ✅
