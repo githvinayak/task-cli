@@ -1,15 +1,23 @@
+use crate::command::{self, SortOrder::SortById};
+
 #[derive(Debug)]
 pub enum SortOrder {
     SortById,
     SortByStatus,
 }
 
+#[derive(Debug)]
 pub enum Command {
     Add(String),
     List(SortOrder),
     Done(u32),
     Delete(u32),
     Clear,
+    Help
+}
+
+impl Command{
+    pub const ALL:[Self;5] = [Command::Add(String::new()),Command::List(SortById),Command::Done(0),Command::Delete(0),Command::Clear]; 
 }
 
 pub fn parse_command(input: &str) -> Option<Command> {
@@ -62,6 +70,7 @@ pub fn parse_command(input: &str) -> Option<Command> {
             }
         }
         "clear" => Some(Command::Clear),
+        "help" => Some(Command::Help),
         _ => None,
     }
 }

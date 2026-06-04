@@ -350,12 +350,17 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
                 println!("cancelled")
             }
         }
+        Command::Help => {
+            for cmd in Command::ALL {
+                println!("{:?}", cmd);
+            }
+        }
     }
 }
 
 fn main() {
     let args: Vec<String> = env::args().collect();
- println!("args: {:?}", args);
+    println!("args: {:?}", args);
     if args.len() < 2 {
         println!("Usage: taskcli <command> [args]");
         println!("Commands: add <title> | list <sorting order>| done <id> | delete <id>");
