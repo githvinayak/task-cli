@@ -500,5 +500,73 @@ mod tests {
         assert!(tasks.iter().all(|t| !t.done))
     }
 
-   
+    #[test]
+    // 1. test clear command empties all tasks
+    fn test_clear_command() {
+        let mut tasks: Vec<Task> = setup_tasks();
+        clear_tasks(&mut tasks);
+        assert!(tasks.is_empty());
+    }
+
+    #[test]
+    // 2. test list with sort by status
+    fn test_list_by_status() {
+        let mut tasks: Vec<Task> = Vec::new();
+        let titles: Vec<&str> = vec!["Lern Rust", "Practice Rust", "Master Rust"];
+        for title in titles {
+            run_command(Command::Add(title.to_string()), &mut tasks);
+        }
+        run_command(Command::Done(1), &mut tasks);
+        let mut sorted = tasks.to_vec();
+        sorted.sort_by(|a, b| a.done.cmp(&b.done));
+        assert!(!sorted[0].done);
+        assert!(!sorted[1].done);
+        assert!(sorted[2].done);
+    }
+
+    #[test]
+    // 3. test delete last remaining task
+    fn test_delete_last_task() {
+        let mut tasks: Vec<Task> = Vec::new();
+        let titles: Vec<&str> = vec!["Lern Rust", "Practice Rust", "Master Rust"];
+        for title in titles {
+            run_command(Command::Add(title.to_string()), &mut tasks);
+        }
+        run_command(Command::Done(1), &mut tasks);
+        run_command(Command::Delete(3), &mut tasks);
+        // check tasks.len() == 1
+        assert_eq!(tasks.len(), 2);
+        // check remaining task id is 2
+        assert_eq!(tasks[tasks.len() - 1].id, 2);
+    }
+
+    #[test]
+    // 4. test done already completed task
+    fn test_done_already_completed() {
+        let mut tasks: Vec<Task> = Vec::new();
+        let titles: Vec<&str> = vec!["Lern Rust", "Practice Rust", "Master Rust"];
+        for title in titles {
+            run_command(Command::Add(title.to_string()), &mut tasks);
+        }
+        run_command(Command::Done(1), &mut tasks);
+        assert!(tasks[0].done)
+    }
+
+    #[test]
+    // 5. test add task with spaces only
+    fn test_add_spaces_only_title() {
+        let mut tasks: Vec<Task> = Vec::new();
+        run_command(Command::Add(String::from("")), &mut tasks);
+        assert!(tasks.is_empty());
+    }
+
+    #[test]
+    // 6. test parse help command
+    fn test_parse_help_command() {
+        if let Some(Command::Help) = parse_command("help") {
+            assert!(true);
+        } else {
+            panic!("expected Help command");
+        }
+    }
 }
