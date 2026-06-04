@@ -315,6 +315,10 @@ fn ask_confirmation(message: &str) -> bool {
     }
 }
 
+fn clear_tasks(tasks:&mut Vec<Task>){
+    tasks.clear();
+}
+
 fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
     // println!("tasks {}",tasks.len());
     match cmd {
@@ -330,6 +334,9 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
         Command::List(sort) => list_tasks(tasks, sort),
         Command::Done(id) => match find_task(tasks, id) {
             Some(task) => {
+                if task.done == true {
+                    println!("Task {} is already completed", id);
+                }
                 task.mark_done();
                 println!("Task {} marked as done", id);
             }
@@ -345,7 +352,7 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
         }
         Command::Clear => {
             if ask_confirmation("Arey you sure yes/no?") {
-                tasks.clear();
+                clear_tasks(tasks);
             } else {
                 println!("cancelled")
             }
@@ -475,7 +482,7 @@ mod tests {
 
     #[test]
 
-    fn test_empty_task_Add() {
+    fn test_empty_task_add() {
         let mut tasks: Vec<Task> = Vec::new();
 
         run_command(Command::Add(String::from("")), &mut tasks);
@@ -492,4 +499,6 @@ mod tests {
 
         assert!(tasks.iter().all(|t| !t.done))
     }
+
+   
 }
