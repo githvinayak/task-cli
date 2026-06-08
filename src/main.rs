@@ -191,7 +191,6 @@
 
 // check if file exists
 //std::path::Path::new(FILE_PATH).exists()
-
 // // read file to string
 // std::fs::read_to_string(FILE_PATH).unwrap()
 

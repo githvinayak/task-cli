@@ -1,11 +1,10 @@
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum SortOrder {
     SortById,
     SortByStatus,
 }
-
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Command {
     Add(String),
     List(SortOrder),
