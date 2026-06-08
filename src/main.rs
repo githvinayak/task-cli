@@ -188,15 +188,6 @@
 //           assert_eq!(tasks[0].title,"learn rust")
 //     }
 // }
-mod command;
-mod storage;
-mod task;
-use command::{Command, SortOrder, parse_command};
-use std::env;
-use std::io;
-use std::io::Write;
-use storage::{load_tasks, save_tasks};
-use task::Task;
 
 // check if file exists
 //std::path::Path::new(FILE_PATH).exists()
@@ -248,6 +239,16 @@ use task::Task;
 //         tasks.iter().filter(|t| !t.done).count()
 //     );
 // }
+
+mod command;
+mod storage;
+mod task;
+use command::{Command, SortOrder, parse_command};
+use std::env;
+use std::io;
+use std::io::Write;
+use storage::{load_tasks, save_tasks};
+use task::Task;
 
 fn list_tasks(tasks: &[Task], sort: SortOrder) {
     let mut sorted = tasks.to_vec();
@@ -315,7 +316,7 @@ fn ask_confirmation(message: &str) -> bool {
     }
 }
 
-fn clear_tasks(tasks:&mut Vec<Task>){
+fn clear_tasks(tasks: &mut Vec<Task>) {
     tasks.clear();
 }
 
@@ -328,17 +329,18 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
                 tasks.push(Task::new(id, title.clone()));
                 println!("Task {} added : {}", id, title);
             } else {
-                println!("Please provide valid title")
+                println!("❌ Please provide a valid title");
             }
         }
         Command::List(sort) => list_tasks(tasks, sort),
         Command::Done(id) => match find_task(tasks, id) {
             Some(task) => {
-                if task.done == true {
-                    println!("Task {} is already completed", id);
+                if task.done {
+                    println!("⚠️ Task {} is already completed", id);
+                } else {
+                    task.mark_done();
+                    println!("✅ Task {} marked as done!", id);
                 }
-                task.mark_done();
-                println!("Task {} marked as done", id);
             }
             None => println!("❌ No task found with id: {}", id),
         },
@@ -351,10 +353,10 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
             }
         }
         Command::Clear => {
-            if ask_confirmation("Arey you sure yes/no?") {
+            if ask_confirmation("Are you sure yes/no?") {
                 clear_tasks(tasks);
             } else {
-                println!("cancelled")
+                println!("❌ Cancelled")
             }
         }
         Command::Help => {
@@ -372,7 +374,6 @@ fn run_command(cmd: Command, tasks: &mut Vec<Task>) {
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    println!("args: {:?}", args);
     if args.len() < 2 {
         println!("Usage: taskcli <command> [args]");
         println!("Commands: add <title> | list <sorting order>| done <id> | delete <id>");
