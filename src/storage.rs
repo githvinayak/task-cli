@@ -9,20 +9,20 @@ pub fn load_tasks() -> Vec<Task> {
      let content = match std::fs::read_to_string(FILE_PATH){
         Ok(c)=> c,
         Err(e)=>{
-         println!("cannot read file : file might be corrupted {}",e);
-          return Vec::new();
+         println!("⚠️ Could not read file: {}", e);
+           return Vec::new();
         }
      };
 
      match serde_json::from_str(&content){
         Ok(tasks)=> tasks,
         Err(e)=>{
-         println!("cannot read file : file might be corrupted {}",e);
+         println!("⚠️ Could not read file: {}", e);
           return Vec::new();
         }
      }
     }else{
-        return Vec::new();
+         Vec::new()
     }
 }
 
